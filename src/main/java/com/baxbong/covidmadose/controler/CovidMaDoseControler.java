@@ -27,7 +27,7 @@ public class CovidMaDoseControler {
 
     @GetMapping(path = "/{ville}")
     public ResponseEntity<List<CentreVaccination>> getDoses(@PathVariable String ville) {
-        return covidMaDoseService.listDoses(ville);
+        return covidMaDoseService.chronodoses(ville);
     }
 
 }

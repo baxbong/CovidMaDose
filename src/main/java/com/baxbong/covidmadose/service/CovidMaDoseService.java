@@ -10,10 +10,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,7 +30,7 @@ public class CovidMaDoseService {
     @Autowired
     CentreVaccinationRepository centreVaccinationRepository;
 
-    public ResponseEntity<List<CentreVaccination>> listDoses(String ville) {
+    public ResponseEntity<List<CentreVaccination>> chronodoses(String ville) {
 
         List<CentreVaccination> centreVaccinations = centreVaccinationRepository.findAllByVille(ville);
         List<CentreVaccination> centreVaccinationsToReturn = new ArrayList<>();
@@ -37,10 +39,14 @@ public class CovidMaDoseService {
 
         for (CentreVaccination currentCentreVaccination : centreVaccinations) {
             ResponseEntity<AvailabilityDoctolib> currentAvailabilityDoctolib = restTemplate.exchange(currentCentreVaccination.getJson(), HttpMethod.GET, new HttpEntity<Object>(headers), AvailabilityDoctolib.class);
-            int total = currentAvailabilityDoctolib.getBody().getTotal();
-            if(total > 0 ) {
-                log.info(new Date() + " " + currentCentreVaccination.getUrl());
-                centreVaccinationsToReturn.add(currentCentreVaccination);
+            AvailabilityDoctolib availabilityDoctolib = currentAvailabilityDoctolib.getBody();
+            if(!CollectionUtils.isEmpty(availabilityDoctolib.getAvailabilities())) {
+                LocalDate firstAppointmentDate = availabilityDoctolib.getAvailabilities().get(0).getDate();
+                LocalDate twoDaysFromNow = LocalDate.now().plusDays(2);
+                if(firstAppointmentDate.isBefore(twoDaysFromNow)) {
+                    log.info(new Date() + " " + currentCentreVaccination.getUrl());
+                    centreVaccinationsToReturn.add(currentCentreVaccination);
+                }
             }
         }
         return ResponseEntity.ok(centreVaccinationsToReturn);
