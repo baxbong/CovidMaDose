@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @Slf4j
-@CrossOrigin(origins = {"${covidmadose.front}"})
+@CrossOrigin
 @RestController
 public class CovidMaDoseControler {
 
