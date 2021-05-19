@@ -38,7 +38,7 @@ public class CovidMaDoseService {
         for (CentreVaccination currentCentreVaccination : centreVaccinations) {
             ResponseEntity<AvailabilityDoctolib> currentAvailabilityDoctolib = restTemplate.exchange(currentCentreVaccination.getJson(), HttpMethod.GET, new HttpEntity<Object>(headers), AvailabilityDoctolib.class);
             int total = currentAvailabilityDoctolib.getBody().getTotal();
-            if(total == 0 ) {
+            if(total > 0 ) {
                 log.info(new Date() + " " + currentCentreVaccination.getUrl());
                 centreVaccinationsToReturn.add(currentCentreVaccination);
             }
