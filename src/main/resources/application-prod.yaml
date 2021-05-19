@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: "jdbc:mariadb://${MARIADB_IP}:${MARIADB_PORT}/${MARIADB_NAME}"
+    username: "${MARIADB_USERNAME}"
+    password: "${MARIADB_PASSWORD}"
+server:
+  port: 8082
+covidmadose:
+  front: "https://covid-ma-dose.herokuapp.com"

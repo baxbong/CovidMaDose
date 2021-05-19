@@ -1,0 +1,28 @@
+databaseChangeLog:
+- changeSet:
+    id: 1621429767019-1
+    author: Xavier (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: BIGINT
+        - column:
+            name: json
+            type: VARCHAR(511)
+        - column:
+            name: nom
+            type: VARCHAR(255)
+        - column:
+            name: url
+            type: VARCHAR(511)
+        - column:
+            name: ville
+            type: VARCHAR(255)
+        tableName: centre_vaccination
+

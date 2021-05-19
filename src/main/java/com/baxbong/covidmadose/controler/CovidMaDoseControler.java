@@ -1,12 +1,13 @@
 package com.baxbong.covidmadose.controler;
 
-import com.baxbong.covidmadose.model.DoctoLinks;
+import com.baxbong.covidmadose.model.dao.CentreVaccination;
 import com.baxbong.covidmadose.service.CovidMaDoseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,9 +24,10 @@ public class CovidMaDoseControler {
         this.covidMaDoseService = covidMaDoseService;
     }
 
-    @GetMapping(path = "/")
-    public ResponseEntity<List<DoctoLinks>> getDose() {
-        return covidMaDoseService.listDoses();
+
+    @GetMapping(path = "/{ville}")
+    public ResponseEntity<List<CentreVaccination>> getDoses(@PathVariable String ville) {
+        return covidMaDoseService.listDoses(ville);
     }
 
 }

@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  db:
+    image: mariadb:10.4
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: covid-ma-dose
+      MYSQL_USER: covidmadose
+      MYSQL_PASSWORD: covidmadose
+    ports:
+      - 10036:3306
