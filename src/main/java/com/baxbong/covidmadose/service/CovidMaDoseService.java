@@ -43,7 +43,8 @@ public class CovidMaDoseService {
             if(!CollectionUtils.isEmpty(availabilityDoctolib.getAvailabilities())) {
                 LocalDate firstAppointmentDate = availabilityDoctolib.getAvailabilities().get(0).getDate();
                 LocalDate twoDaysFromNow = LocalDate.now().plusDays(2);
-                if(firstAppointmentDate.isBefore(twoDaysFromNow)) {
+                int total = availabilityDoctolib.getTotal();
+                if(total > 0 && firstAppointmentDate.isBefore(twoDaysFromNow)) {
                     log.info(new Date() + " " + currentCentreVaccination.getUrl());
                     centreVaccinationsToReturn.add(currentCentreVaccination);
                 }

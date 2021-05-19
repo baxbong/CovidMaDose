@@ -9,6 +9,7 @@ import java.util.List;
 public class AvailabilityDoctolib {
 
     private List<Availability> availabilities;
+    private int total;
 
     @Data
     public static class Availability {
