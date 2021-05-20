@@ -1,11 +1,12 @@
 package com.baxbong.covidmadose.service;
 
-import com.baxbong.covidmadose.model.dao.CentreVaccination;
+import com.baxbong.covidmadose.model.dao.VaccinationCenter;
+import com.baxbong.covidmadose.model.dao.City;
 import com.baxbong.covidmadose.model.doctolib.DoctolibResponse;
-import com.baxbong.covidmadose.model.repository.CentreVaccinationRepository;
+import com.baxbong.covidmadose.model.repository.VaccinationCenterRepository;
+import com.baxbong.covidmadose.model.repository.CityRepository;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -25,35 +26,49 @@ import java.util.List;
 @Log4j
 public class CovidMaDoseService {
 
-    RestTemplate restTemplate = new RestTemplate();
+    public static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36";
+    public static final String USER_AGENT_KEY = "User-Agent";
 
-    @Autowired
-    CentreVaccinationRepository centreVaccinationRepository;
+    private final VaccinationCenterRepository vaccinationCenterRepository;
+    private final CityRepository cityRepository;
+    private final RestTemplate restTemplate;
 
-    public ResponseEntity<List<CentreVaccination>> chronodoses(String ville) {
 
-        List<CentreVaccination> centreVaccinations = centreVaccinationRepository.findAllByVille(ville);
-        List<CentreVaccination> centreVaccinationsToReturn = new ArrayList<>();
+    public CovidMaDoseService(VaccinationCenterRepository vaccinationCenterRepository, CityRepository cityRepository) {
+        this.vaccinationCenterRepository = vaccinationCenterRepository;
+        this.cityRepository = cityRepository;
+        this.restTemplate = new RestTemplate();
+    }
+
+    public List<VaccinationCenter> chronodoses(String ville) {
+
+        List<VaccinationCenter> vaccinationCenters = vaccinationCenterRepository.findAllByCityName(ville);
+        List<VaccinationCenter> vaccinationsToReturnCenter = new ArrayList<>();
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36");
+        headers.add(USER_AGENT_KEY, USER_AGENT_VALUE);
 
         LocalDate today = LocalDate.now();
         LocalDate twoDaysFromNow = LocalDate.now().plusDays(2);
 
-        for (CentreVaccination currentCentreVaccination : centreVaccinations) {
-            String urlJsonWithStartDate = currentCentreVaccination.getJson() + "&start_date=" + today;
+        for (VaccinationCenter currentVaccinationCenter : vaccinationCenters) {
+            String urlJsonWithStartDate = currentVaccinationCenter.getJson() + "&start_date=" + today;
             ResponseEntity<DoctolibResponse> doctolibResponseEntity = restTemplate.exchange(urlJsonWithStartDate, HttpMethod.GET, new HttpEntity<>(headers), DoctolibResponse.class);
             DoctolibResponse doctolibResponse = doctolibResponseEntity.getBody();
             if(!CollectionUtils.isEmpty(doctolibResponse.getAvailabilities())) {
                 for(DoctolibResponse.Availability availabilityDoctolib : doctolibResponse.getAvailabilities()) {
-                    if(availabilityDoctolib.getDate().isBefore(twoDaysFromNow) && !CollectionUtils.isEmpty(availabilityDoctolib.getSlots())){ //Chronodose = Need to be available today or tomorrow
-                        log.info(new Date() + " " + currentCentreVaccination.getUrl());
-                        centreVaccinationsToReturn.add(currentCentreVaccination);
+                    //Chronodose = Need to be available today or tomorrow
+                    if(availabilityDoctolib.getDate().isBefore(twoDaysFromNow) && !CollectionUtils.isEmpty(availabilityDoctolib.getSlots())){
+                        log.info(new Date() + " " + currentVaccinationCenter.getUrl());
+                        vaccinationsToReturnCenter.add(currentVaccinationCenter);
                     }
                 }
             }
         }
-        return ResponseEntity.ok(centreVaccinationsToReturn);
+        return vaccinationsToReturnCenter;
+    }
+
+    public List<City> getAllCities() {
+        return cityRepository.findAll();
     }
 }
 

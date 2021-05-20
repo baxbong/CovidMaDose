@@ -1,6 +1,23 @@
 databaseChangeLog:
 - changeSet:
-    id: 1621429767019-1
+    id: 1621526778652-1
+    author: Xavier (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: BIGINT
+        - column:
+            name: name
+            type: VARCHAR(255)
+        tableName: city
+- changeSet:
+    id: 1621526778652-2
     author: Xavier (generated)
     changes:
     - createTable:
@@ -14,15 +31,42 @@ databaseChangeLog:
             type: BIGINT
         - column:
             name: json
-            type: VARCHAR(511)
+            type: VARCHAR(255)
         - column:
-            name: nom
+            name: name
             type: VARCHAR(255)
         - column:
             name: url
-            type: VARCHAR(511)
-        - column:
-            name: ville
             type: VARCHAR(255)
-        tableName: centre_vaccination
+        - column:
+            defaultValueComputed: 'NULL'
+            name: city_id
+            type: BIGINT
+        tableName: vaccination_center
+- changeSet:
+    id: 1621526778652-3
+    author: Xavier (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            defaultValueComputed: 'NULL'
+            name: city_id
+        indexName: FKiyh8cprbla5o13gyylomu5uex
+        tableName: vaccination_center
+- changeSet:
+    id: 1621526778652-4
+    author: Xavier (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: city_id
+        baseTableName: vaccination_center
+        constraintName: FKiyh8cprbla5o13gyylomu5uex
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: city
+        validate: true
 

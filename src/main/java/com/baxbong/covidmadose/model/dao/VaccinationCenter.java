@@ -1,5 +1,6 @@
 package com.baxbong.covidmadose.model.dao;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,14 +10,16 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "centre_vaccination")
-public class CentreVaccination {
+@Entity(name = "vaccination_center")
+public class VaccinationCenter {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private String ville;
-    private String nom;
+    @ManyToOne
+    @JsonBackReference
+    private City city;
+    private String name;
     private String url;
     private String json;
 

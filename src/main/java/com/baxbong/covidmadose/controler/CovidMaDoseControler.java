@@ -1,6 +1,7 @@
 package com.baxbong.covidmadose.controler;
 
-import com.baxbong.covidmadose.model.dao.CentreVaccination;
+import com.baxbong.covidmadose.model.dao.VaccinationCenter;
+import com.baxbong.covidmadose.model.dao.City;
 import com.baxbong.covidmadose.service.CovidMaDoseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,15 @@ public class CovidMaDoseControler {
         this.covidMaDoseService = covidMaDoseService;
     }
 
+    @GetMapping(path = "/cities/")
+    public ResponseEntity<List<City>> getCities() {
+        return ResponseEntity.ok(covidMaDoseService.getAllCities());
+    }
 
-    @GetMapping(path = "/{ville}")
-    public ResponseEntity<List<CentreVaccination>> getDoses(@PathVariable String ville) {
-        return covidMaDoseService.chronodoses(ville);
+
+    @GetMapping(path = "/chronodoses/{city}")
+    public ResponseEntity<List<VaccinationCenter>> getDoses(@PathVariable String city) {
+        return ResponseEntity.ok(covidMaDoseService.chronodoses(city));
     }
 
 }
