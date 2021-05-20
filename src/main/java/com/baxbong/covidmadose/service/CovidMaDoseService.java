@@ -1,7 +1,7 @@
 package com.baxbong.covidmadose.service;
 
 import com.baxbong.covidmadose.model.dao.CentreVaccination;
-import com.baxbong.covidmadose.model.doctolib.AvailabilityDoctolib;
+import com.baxbong.covidmadose.model.doctolib.DoctolibResponse;
 import com.baxbong.covidmadose.model.repository.CentreVaccinationRepository;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
@@ -37,16 +37,19 @@ public class CovidMaDoseService {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36");
 
+        LocalDate today = LocalDate.now();
+        LocalDate twoDaysFromNow = LocalDate.now().plusDays(2);
+
         for (CentreVaccination currentCentreVaccination : centreVaccinations) {
-            ResponseEntity<AvailabilityDoctolib> currentAvailabilityDoctolib = restTemplate.exchange(currentCentreVaccination.getJson(), HttpMethod.GET, new HttpEntity<Object>(headers), AvailabilityDoctolib.class);
-            AvailabilityDoctolib availabilityDoctolib = currentAvailabilityDoctolib.getBody();
-            if(!CollectionUtils.isEmpty(availabilityDoctolib.getAvailabilities())) {
-                LocalDate firstAppointmentDate = availabilityDoctolib.getAvailabilities().get(0).getDate();
-                LocalDate twoDaysFromNow = LocalDate.now().plusDays(2);
-                int total = availabilityDoctolib.getTotal();
-                if(total > 0 && firstAppointmentDate.isBefore(twoDaysFromNow)) {
-                    log.info(new Date() + " " + currentCentreVaccination.getUrl());
-                    centreVaccinationsToReturn.add(currentCentreVaccination);
+            String urlJsonWithStartDate = currentCentreVaccination.getJson() + "&start_date=" + today;
+            ResponseEntity<DoctolibResponse> doctolibResponseEntity = restTemplate.exchange(urlJsonWithStartDate, HttpMethod.GET, new HttpEntity<>(headers), DoctolibResponse.class);
+            DoctolibResponse doctolibResponse = doctolibResponseEntity.getBody();
+            if(!CollectionUtils.isEmpty(doctolibResponse.getAvailabilities())) {
+                for(DoctolibResponse.Availability availabilityDoctolib : doctolibResponse.getAvailabilities()) {
+                    if(availabilityDoctolib.getDate().isBefore(twoDaysFromNow) && !CollectionUtils.isEmpty(availabilityDoctolib.getSlots())){ //Chronodose = Need to be available today or tomorrow
+                        log.info(new Date() + " " + currentCentreVaccination.getUrl());
+                        centreVaccinationsToReturn.add(currentCentreVaccination);
+                    }
                 }
             }
         }
