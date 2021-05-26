@@ -70,5 +70,9 @@ public class CovidMaDoseService {
     public List<City> getAllCities() {
         return cityRepository.findAll();
     }
+
+    public List<VaccinationCenter> getVaccinationCenters(String cityName) {
+        return vaccinationCenterRepository.findAllByCityName(cityName);
+    }
 }
 

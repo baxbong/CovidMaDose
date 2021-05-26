@@ -30,6 +30,11 @@ public class CovidMaDoseControler {
         return ResponseEntity.ok(covidMaDoseService.getAllCities());
     }
 
+    @GetMapping(path = "/vaccination-centers/{cityName}")
+    public ResponseEntity<List<VaccinationCenter>> getVaccinationCenters(@PathVariable String cityName) {
+        return ResponseEntity.ok(covidMaDoseService.getVaccinationCenters(cityName));
+    }
+
 
     @GetMapping(path = "/chronodoses/{city}")
     public ResponseEntity<List<VaccinationCenter>> getDoses(@PathVariable String city) {
